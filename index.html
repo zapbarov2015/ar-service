@@ -134,4 +134,95 @@
 
     <script>
         // ===== НАСТРОЙКИ =====
-        // Замени на свой логин и имя репоз
+        // Замени на свой логин и имя репозитория
+        const GITHUB_USER = 'zapbarov2015';  // ← СЮДА ВСТАВЬ СВОЙ ЛОГИН!
+        const REPO_NAME = 'ar-service1';
+        // =====================
+
+        let selectedFile = null;
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const resultBox = document.getElementById('resultBox');
+        const linkBox = document.getElementById('linkBox');
+        const qrImg = document.getElementById('qrImg');
+        const copyBtn = document.getElementById('copyBtn');
+
+        // Drag & Drop
+        dropZone.addEventListener('click', () => fileInput.click());
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = '#28a745';
+        });
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.style.borderColor = '#667eea';
+        });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = '#667eea';
+            if (e.dataTransfer.files.length) {
+                handleFile(e.dataTransfer.files[0]);
+            }
+        });
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        function handleFile(file) {
+            if (!file.name.endsWith('.glb') && !file.name.endsWith('.gltf')) {
+                alert('Пожалуйста, выбери файл формата .glb или .gltf');
+                return;
+            }
+            selectedFile = file;
+            dropZone.innerHTML = `<div style="font-size: 60px;">✅</div><p>${file.name}</p>`;
+            dropZone.style.borderColor = '#28a745';
+            uploadBtn.disabled = false;
+        }
+
+        uploadBtn.addEventListener('click', async () => {
+            if (!selectedFile) {
+                alert('Сначала выбери файл!');
+                return;
+            }
+
+            uploadBtn.disabled = true;
+            uploadBtn.textContent = '⏳ Загрузка...';
+
+            // Генерируем уникальный ID для модели
+            const modelId = Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+            const modelUrl = `https://raw.githubusercontent.com/${GITHUB_USER}/${REPO_NAME}/main/models/${modelId}.glb`;
+
+            // Сохраняем файл локально (в папку models)
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                // Создаем ссылку для просмотра
+                const viewUrl = `https://${GITHUB_USER}.github.io/${REPO_NAME}/viewer.html?id=${modelId}`;
+                
+                linkBox.textContent = viewUrl;
+                linkBox.setAttribute('data-url', viewUrl);
+                
+                // Генерируем QR код
+                qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(viewUrl)}`;
+                
+                resultBox.classList.add('show');
+                
+                uploadBtn.textContent = '✅ Загружено!';
+                setTimeout(() => {
+                    uploadBtn.disabled = false;
+                    uploadBtn.textContent = '⬆️ Загрузить ещё';
+                }, 2000);
+            };
+            reader.readAsDataURL(selectedFile);
+        });
+
+        copyBtn.addEventListener('click', () => {
+            const url = linkBox.getAttribute('data-url');
+            navigator.clipboard.writeText(url).then(() => {
+                alert('Ссылка скопирована!');
+            });
+        });
+    </script>
+</body>
+</html>

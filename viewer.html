@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AR Viewer</title>
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+    <style>
+        body { margin: 0; overflow: hidden; }
+        .loading { 
+            position: fixed; 
+            top: 0; left: 0; 
+            width: 100%; height: 100%; 
+            background: white; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            flex-direction: column; 
+            z-index: 9999;
+        }
+        .loading h2 { margin-top: 20px; color: #333; }
+    </style>
+</head>
+<body>
+    <div class="loading" id="loader">
+        <div style="font-size: 60px;">⏳</div>
+        <h2>Загрузка модели...</h2>
+    </div>
+
+    <a-scene 
+        arjs="sourceType: webcam; 
+               detectionMode: mono_and_matrix;
+               matrixCodeType: 3x3;"
+        vr-mode-ui="enabled: false"
+        renderer="logarithmicDepthBuffer: true;"
+        embedded
+        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
+        
+        <a-assets>
+            <a-asset-item id="model" src=""></a-asset-item>
+        </a-assets>
+
+        <a-marker-camera></a-marker-camera>
+        
+        <a-entity 
+            gltf-model="#model" 
+            scale="5 5 5"
+            position="0 0.5 -2"
+            rotation="0 180 0">
+        </a-entity>
+        
+        <a-entity camera></a-entity>
+    </a-scene>
+
+    <script>
+        // Получаем ID модели из ссылки
+        const urlParams = new URLSearchParams(window.location.search);
+        const modelId = urlParams.get('id');
+        
+        if (!modelId) {
+            alert('Не указана модель!');
+            window.location.href = 'index.html';
+        }
+
+        // Замени на свой логин!
+        const GITHUB_USER = 'zapbarov2015';
+        const REPO_NAME = 'ar-service1';
+
+        // Формируем путь к модели
+        const modelPath = `https://raw.githubusercontent.com/${GITHUB_USER}/${REPO_NAME}/main/models/${modelId}.glb`;
+        
+        // Загружаем модель
+        document.getElementById('model').setAttribute('src', modelPath);
+        
+        // Скрываем лоадер после загрузки
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loader').style.display = 'none';
+            }, 2000);
+        });
+    </script>
+</body>
+</html>
