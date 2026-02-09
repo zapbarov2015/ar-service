@@ -6,7 +6,7 @@
   <title>AR Model</title>
   <style>
     body { margin: 0; overflow: hidden; }
-    #ar-scene { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+    ar-scene { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
   </style>
 </head>
 <body>
@@ -20,7 +20,7 @@
     const modelName = urlParams.get('model') || 'carbon';
     const modelPath = `models/${modelName}.glb`;
 
-    document.body.innerHTML = `
+    document.body.innerHTML =
       <a-scene embedded arjs="debugUIEnabled: false; trackingMethod: best; sourceType: webcam;">
         <a-assets>
           <a-asset-item id="model" src="${modelPath}"></a-asset-item>
@@ -30,7 +30,7 @@
         
         <a-entity camera></a-entity>
       </a-scene>
-    `;
+    ;
   </script>
 </body>
 </html>
